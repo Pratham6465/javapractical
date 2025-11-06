@@ -1,61 +1,74 @@
-public class FCFS {
-    public static void main(String[] args) {
+/*
+   3
+   1 2 5
+   2 0 3
+   3 4 4
+*/
 
-        System.out.println("Enter the number of process");
-        Scanner in = new Scanner(System.in);
-        int numberOfProcesses = in.nextInt();
+import java.util.*;
 
-        int pid[] = new int[numberOfProcesses];
-        int bt[] = new int[numberOfProcesses];
-        int ar[] = new int[numberOfProcesses];
-        int ct[] = new int[numberOfProcesses];
-        int ta[] = new int[numberOfProcesses];
-        int wt[] = new int[numberOfProcesses];
+public class FCFS{
 
-        for(int i = 0; i < numberOfProcesses; i++) {
-            System.out.println("Enter process " + (i+1) + " arrival time: ");
-            ar[i] = in.nextInt();
-            System.out.println("Enter process " + (i+1) + " brust time: ");
-            bt[i] = in.nextInt();
-            pid[i] = i+1;
+    static class process
+    {
+        int id, at, bt, ct, tat, wt;
+        process(int id, int at, int bt)
+        {
+            this.id = id;
+            this.at = at;
+            this.bt = bt;
         }
-        int temp;
-        for (int i = 0; i < numberOfProcesses; i++) {
-            for (int j = i+1; j < numberOfProcesses; j++) {
+    }
 
-                if(ar[i] > ar[j]) {
-                    temp = ar[i];
-                    ar[i] = ar[j];
-                    ar[j] = temp;
+    public static void main(String []arg)
+    {
+        Scanner sobj = new Scanner(System.in);
 
-                    temp = pid[i];
-                    pid[i] = pid[j];
-                    pid[j] = temp;
-                    temp = bt[i];
-                    bt[i] = bt[j];
-                    bt[j] = temp;
-                }
-            }
-        }
+        System.out.print("Enter the number of process: ");
+        int n = sobj.nextInt();
 
-        System.out.println();
-        ct[0] = bt[0] + ar[0];
-        for(int i = 1; i < numberOfProcesses; i++) {
-            ct[i] = ct[i - 1] + bt[i];
-        }
-        for(int i = 0; i < numberOfProcesses; i++) {
-            ta[i] = ct[i] - ar[i];
-            wt[i] = ta[i] - bt[i];
-        }
-        System.out.println("Process\t\tAT\t\tBT\t\tCT\t\tTAT\t\tWT");
-        for(int i = 0; i < numberOfProcesses; i++) {
-            System.out.println(pid[i]+"\t\t\t" + ar[i] + "\t\t" + bt[i]+ "\t\t" + ct[i]+ "\t\t" + ta[i]+ "\t\t" + wt[i]);
+        List<process> processes = new ArrayList<>();
+
+        for(int i = 0; i<n; i++)
+        {
+            int id = sobj.nextInt();
+            int at = sobj.nextInt();
+            int bt = sobj.nextInt();
+
+            process p = new process(id, at, bt);
+            processes.add(p);
         }
 
-        System.out.println("gantt chart: ");
-        for(int i = 0; i < numberOfProcesses; i++) {
-            System.out.print("P" + pid[i] +" ");
-        }
-    }
+        processes.sort(Comparator.comparingInt(p -> p.at));
 
+        int time = 0;
+        double TotalWT = 0;
+        double TotalTAT = 0;
+        int index = 0;
+
+        for(process p : processes)
+        {
+            if(time < p.at)
+                time = p.at;
+
+            time += p.bt;
+
+            p.ct = time;
+
+            p.tat = p.ct - p.at;
+            TotalTAT += p.tat;
+
+            p.wt = p.tat - p.bt;
+            TotalWT += p.wt;
+        }
+
+        for(process p : processes)
+        {
+            System.out.println(p.id +"\t"+p.at+"\t"+p.bt+"\t"+p.ct+"\t"+p.tat+"\t"+p.wt);
+        }
+
+        System.out.printf("\nAvg TAT: %.2f", TotalTAT/n);
+        System.out.printf("\nAvg WT: %.2f", TotalWT/n);
+
+    }
 }
